@@ -1,0 +1,25 @@
+自己捕获 Error: EEXIST: file already exists, mkdir './avatar2'
+    at Object.mkdirSync (node:fs:1350:3)
+    at Object.<anonymous> (C:\Node.js\022-内置模块-fs文件操作模块-2\01-同
+步方式使用.js:10:8)
+    at Module._compile (node:internal/modules/cjs/loader:1099:14)        
+    at Object.Module._extensions..js (node:internal/modules/cjs/loader:1153:10)
+    at Module.load (node:internal/modules/cjs/loader:975:32)
+    at Function.Module._load (node:internal/modules/cjs/loader:822:12)   
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:77:12)
+    at node:internal/main/run_main_module:17:47 {
+  errno: -4075,
+  syscall: 'mkdir',
+  code: 'EEXIST',
+  path: './avatar2'
+}
+
+桃酥@DESKTOP-UIC3CVI MINGW64 /c/Node.js/022-内置模块-fs文件操作模块-2 (master)
+$ node 02-同步方式解决.js 
+null
+
+桃酥@DESKTOP-UIC3CVI MINGW64 /c/Node.js/022-内置模块-fs文件操作模块-2 (master)
+$ node 01-同步方式使用.js 
+
+桃酥@DESKTOP-UIC3CVI MINGW64 /c/Node.js/022-内置模块-fs文件操作模块-2 (master)
+$
