@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        //直接请求猫眼数据有跨域问题，需要node作为客户端，向客户端请求数据
+        // fetch("`https://i.maoyan.com/api/mmdb/movie/v3/list/hot.json?ct=%E5%8C%97%E4%BA%AC&ci=1&channelId=4")
+        fetch("http://localhost:3000/api/aaa")
+            .then(res => res.json())
+            .then(res => console.log(res))
+    </script>
+
+
+</body>
+
+</html>
