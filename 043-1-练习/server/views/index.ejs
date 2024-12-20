@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>
+        <%= title %>
+    </title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+</head>
+
+<body>
+    <h1>mongoDB增删改查的演示</h1>
+    <div>
+        <div>用户名：<input type="text" id="username"></div>
+        <div>密码：<input type="password" id="password"></div>
+        <div>年龄：<input type="number" id="age"></div>
+        <div><button id="register">注册</button></div>
+    </div>
+    <hr>
+    <div>
+        <div>新用户名：<input type="text" id="newUsername" placeholder="新用户名">
+        </div>
+        <div>新密码：<input type="password" id="newPassword" placeholder="新密码">
+        </div>
+        <div>新年龄：<input type="number" id="newAge" placeholder="新年龄">
+        </div>
+    </div>
+    <hr>
+
+
+    <table border="1">
+        <thead>
+            <tr>
+                <td>id</td>
+                <td>用户名</td>
+                <td>年龄</td>
+            </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+
+    </table>
+
+    <script>
+        var register = document.querySelector("#register")
+        var username = document.querySelector("#username")
+        var password = document.querySelector("#password")
+        var age = document.querySelector("#age")
+        var tbody = document.querySelector("tbody")
+        var newUsername = document.querySelector("#newUsername")
+        var newPassword = document.querySelector("#newPassword")
+        var newAge = document.querySelector("#newAge")
+
+        //注册
+        register.onclick = () => {
+            console.log(username.value, password.value, age.value)
+            fetch("/api/user/add", {
+                method: "POST",
+                body: JSON.stringify({
+                    // 带给后端的数据
+                    username: username.value,
+                    password: password.value,
+                    age: age.value
+                }),
+                headers: {
+                    "content-type": "application/json"
+                }
+            }).then(res => res.json()).then(res => {
+                console.log(res)
+                renderByOption()
+            })
+        }
+        //更新和删除
+        tbody.onclick = (event) => {
+            console.log(event)
+            const { target } = event
+            const { dataset, className } = target
+            const { id } = dataset
+            if (className === "update_btn") {
+                //update后面之后要改为具体id
+                fetch(`/api/user/update/${id}`, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        // 带给后端的数据
+                        username: newUsername.value,
+                        password: newPassword.value,
+                        age: newAge.value
+                    }),
+                    headers: {
+                        "content-type": "application/json"
+                    }
+                }).then(res => res.json()).then(res => {
+                    console.log(res)
+                    renderByOption()
+
+                })
+            } else if (className === "delete_btn") {
+                fetch(`/api/user/delete/${id}`).then(res => res.json()).then(res => {
+                    console.log(res)
+                    renderByOption()
+                })
+            }
+
+        }
+
+        //查
+        //获取列表
+        function renderByOption() {
+            fetch("/api/user/list?page=1&limit=10").then(res => res.json()).then(res => {
+                console.log(res)
+                var tbody = document.querySelector("tbody")
+                tbody.innerHTML = res.map(item => `
+      <tr>
+        <td>${item._id}</td>
+        <td>${item.username}</td>
+        <td>${item.age}</td>
+        <td>
+        <button data-id=${item._id} class="update_btn">更新</button>
+        <button data-id=${item._id} class="delete_btn">删除</button>
+        </td>
+        </tr>
+        `).join("")
+            })
+        }
+        renderByOption()
+    </script>
+</body>
+
+</html>

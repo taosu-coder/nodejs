@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>
+        <%= title %>
+    </title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+</head>
+
+<body>
+    <h1>mongoDB增删改查的演示</h1>
+    <div>
+        <div>用户名：<input type="text" id="username"></div>
+        <div>密码：<input type="password" id="password"></div>
+        <div>年龄：<input type="number" id="age"></div>
+        <div><button id="register">注册</button></div>
+    </div>
+    <hr>
+    <div>
+        <button id="update">更新</button>
+        <button id="delete">删除</button>
+    </div>
+    <hr>
+
+
+    <table border="1">
+        <thead>
+            <tr>
+                <td>id</td>
+                <td>用户名</td>
+                <td>年龄</td>
+            </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+
+    </table>
+
+    <script>
+        var register = document.querySelector("#register")
+        var username = document.querySelector("#username")
+        var password = document.querySelector("#password")
+        var age = document.querySelector("#age")
+        var update = document.querySelector("#update")
+        var deletebutton = document.querySelector("#delete")
+
+        register.onclick = () => {
+            console.log(username.value, password.value, age.value)
+            fetch("/api/user/add", {
+                method: "POST",
+                body: JSON.stringify({
+                    // 带给后端的数据
+                    username: username.value,
+                    password: password.value,
+                    age: age.value
+                }),
+                headers: {
+                    "content-type": "application/json"
+                }
+            }).then(res => res.json()).then(res => {
+                console.log(res)
+
+            })
+        }
+
+        update.onclick = () => {
+            //update后面之后要改为具体id
+            fetch("/api/user/update/675c49fa7db8f08119f04288", {
+                method: "POST",
+                body: JSON.stringify({
+                    // 带给后端的数据
+                    username: "修改的名字",
+                    password: "修改的密码",
+                    age: 1
+                }),
+                headers: {
+                    "content-type": "application/json"
+                }
+            }).then(res => res.json()).then(res => {
+                console.log(res)
+
+            })
+        }
+
+        deletebutton.onclick = () => {
+            fetch("/api/user/delete/675c49fa7db8f08119f04288").then(res => res.json()).then(res => {
+                console.log(res)
+            })
+        }
+
+        //获取列表
+        fetch("/api/user/list?page=1&limit=10").then(res => res.json()).then(res => {
+            console.log(res)
+            var tbody = document.querySelector("tbody")
+            tbody.innerHTML = res.map(item => `
+      <tr>
+        <td>${item._id}</td>
+        <td>${item.username}</td>
+        <td>${item.age}</td>
+        </tr>
+        <button>更新</button>
+        <button>删除</button>
+        `).join("")
+        })
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>
+        <%= title %>
+    </title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <!-- 引入axios -->
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.6.7/dist/axios.min.js"></script>
+    <script>
+        //axios拦截器配置interceptor，一个页面可以共享（如果模块化，就做一个）
+        // Add a request interceptor
+        axios.interceptors.request.use(function (config) {
+            console.log("请求发出前，执行的方法")
+            //每次发请求前，要带着token给后端，后端好做校验
+            const token = localStorage.getItem("token")
+            config.headers.Authorization = `Bearer ${token}`//将来每次给后端发请求，都会带上Authorization字段："Bearer ${token}"，Bearer票根(不成文规定)
+            return config;//config:请求对象
+        }, function (error) {
+            return Promise.reject(error);
+        });
+
+        //每次响应时，把后端传来的最新的token存在authorization里
+        axios.interceptors.response.use(function (response) {
+            // console.log("请求成功后（响应后），第一个调用的方法")
+            console.log(response.headers)
+            const { authorization } = response.headers
+            authorization && localStorage.setItem("token", authorization)
+            // Do something with response data
+            return response;
+        }, function (error) {
+            console.log(error.response.status)
+            if (error.response.status === 401) {
+                localStorage.removeItem("token")
+                location.href = "/login"
+            }
+            return Promise.reject(error);
+        });
+
+    </script>
+    <style>
+        img {
+            width: 60px;
+            height: 60px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>后台系统-用户管理业务</h1>
+    <button id="exit">退出登录</button>
+    <div>
+        <div>用户名：<input type="text" id="username"></div>
+        <div>密码：<input type="password" id="password"></div>
+        <div>年龄：<input type="number" id="age"></div>
+        <!-- 支持上传多个文件file，加multiple属性 ，后端配合也要修改upload.array等-->
+        <div>头像：<input type="file" id="avatar"></div>
+        <div><button id="register">添加用户</button></div>
+    </div>
+    <hr>
+    <div>
+        <div>新用户名：<input type="text" id="newUsername" placeholder="新用户名">
+        </div>
+        <div>新密码：<input type="password" id="newPassword" placeholder="新密码">
+        </div>
+        <div>新年龄：<input type="number" id="newAge" placeholder="新年龄">
+        </div>
+    </div>
+    <hr>
+
+
+    <table border="1">
+        <thead>
+            <tr>
+                <td>id</td>
+                <td>用户名</td>
+                <td>年龄</td>
+                <td>头像</td>
+            </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+
+    </table>
+
+    <script>
+        var register = document.querySelector("#register")
+        var username = document.querySelector("#username")
+        var password = document.querySelector("#password")
+        var age = document.querySelector("#age")
+        var tbody = document.querySelector("tbody")
+        var newUsername = document.querySelector("#newUsername")
+        var newPassword = document.querySelector("#newPassword")
+        var newAge = document.querySelector("#newAge")
+        var exit = document.querySelector("#exit")
+        var avatar = document.querySelector("#avatar")
+
+        //注册
+        register.onclick = () => {
+            // console.log(username.value, password.value, age.value, avatar.files[0])
+            console.log('avatar.files[0]=>', avatar.files[0])
+            const formdata = new FormData()
+            //传给后端的数据
+            formdata.append("username", username.value)
+            formdata.append("password", password.value)
+            formdata.append("age", age.value)
+            formdata.append("avatar", avatar.files[0])
+
+            axios.post("/api/user", formdata, {
+                headers: {
+                    "content-type": "multipart/form-data"
+                }
+            }
+            ).then(res => {
+                console.log(res.data)
+                renderByOption()
+            })
+        }
+
+
+        //更新和删除
+        tbody.onclick = (event) => {
+            console.log(event)
+            console.log(event)
+            const { target } = event
+            const { dataset, className } = target
+            const { id } = dataset
+            if (className === "update_btn") {
+                axios.put(`api/user/${id}`, {
+                    username: newUsername.value,
+                    password: newPassword.value,
+                    age: newAge.value
+                }).then(res => {
+                    renderByOption()
+                })
+            } else if (className === "delete_btn") {
+                axios.delete(`api/user/${id}`).then(res => {
+                    renderByOption()
+                })
+            }
+
+        }
+
+        //查
+        //获取列表
+        function renderByOption() {
+            axios.get("/api/user?page=1&limit=10").then(res => {
+                res = res.data
+                console.log(res.data)
+                var tbody = document.querySelector("tbody")
+                tbody.innerHTML = res.map(item => `
+      <tr>
+        <td>${item._id}</td>
+        <td>${item.username}</td>
+        <td>${item.age}</td>
+        <td><img src="${item.avatar}"></td>
+        <td>
+        <button data-id=${item._id} class="update_btn">更新</button>
+        <button data-id=${item._id} class="delete_btn">删除</button>
+        </td>
+        </tr>
+        `).join("")
+            })
+        }
+        renderByOption()
+
+        //退出,因为不用在后端退出了，无法在后端注销，所以直接把本地token移除
+        exit.onclick = () => {
+            localStorage.removeItem("token")
+            location.href = "/login"
+        }
+    </script>
+</body>
+
+</html>

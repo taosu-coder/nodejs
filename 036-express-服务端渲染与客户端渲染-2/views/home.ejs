@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    home页面
+    <%- include("./header.ejs",{isShowTitle:true}) %>
+
+        <!-- 前端做好模板，后端修改成真数据 -->
+        <ul>
+            <%for(var i=0;i<list.length;i++){ %>
+                <li>
+                    <%= list[i]%>
+                </li>
+                <% } %>
+                    <%#不加等号:流程控制标签，可以分开包 加等号:输出标签，变量 %>
+        </ul>
+        <div>最新消息：<%= myhtml%>
+        </div>
+        <!-- 加=号不解析（更安全）
+    加-号解析（足够信任脚本可解析）-->
+        <div>最新消息：<%- myhtml%></div>
+
+        <%# 我是注释,这个注释不会在控制台显示，只有开发者能看到,以前的注释太多会无形增加代码体积%>
+</body>
+
+</html>

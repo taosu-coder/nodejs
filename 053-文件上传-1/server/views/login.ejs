@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <!-- 引入axios -->
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.6.7/dist/axios.min.js"></script>
+    <script>
+        //axios拦截器配置interceptor，一个页面可以共享（如果模块化，就做一个）
+        // Add a request interceptor
+        axios.interceptors.request.use(function (config) {
+            console.log("请求发出前，执行的方法")
+            // Do something before request is sent
+            return config;
+        }, function (error) {
+            // Do something with request error
+            return Promise.reject(error);
+        });
+
+        // Add a response interceptor
+        axios.interceptors.response.use(function (response) {
+            // console.log("请求成功后（响应后），第一个调用的方法")
+            console.log(response.headers)
+            const { authorization } = response.headers
+            authorization && localStorage.setItem("token", authorization)
+            // Do something with response data
+            return response;
+        }, function (error) {
+            // Any status codes that falls outside the range of 2xx cause this function to trigger
+            // Do something with response error
+            return Promise.reject(error);
+        });
+
+    </script>
+</head>
+
+<body>
+    <h1>登录页面</h1>
+    <div>
+        <div>用户名：<input type="text" id="username"></div>
+        <div>密码：<input type="password" id="password"></div>
+        <div><button id="login">登录</button></div>
+    </div>
+
+    <script>
+        var username = document.querySelector("#username")
+        var password = document.querySelector("#password")
+        var login = document.querySelector("#login")
+
+        login.onclick = () => {
+            console.log(username.value, password.value)
+            //axios
+            axios.post("/api/login", {
+                // 带给后端的数据
+                username: username.value,
+                password: password.value
+
+            }).then(res => {
+                console.log(res.data)//res.header:后端返回的响应头，res.data:后端返回的响应体（响应正文）
+                if (res.data.ok === 1) {
+                    //存储token值
+                    location.href = "/"
+                } else {
+                    alert("用户名密码不匹配")
+                }
+            })
+        }
+    </script>
+</body>
+
+</html>

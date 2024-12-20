@@ -1,7 +1,7 @@
 var http = require("http")
 var https = require("https")
 var url = require("url")
-var cheerio = require("cheerio")
+// var cheerio = require("cheerio")
 
 http.createServer((req, res) => {
     var urlobj = url.parse(req.url, true)
@@ -18,6 +18,7 @@ http.createServer((req, res) => {
             //做客户端 去猫眼要数据
             httpget((data) => {
                 //返回爬完的有效信息
+                // res.end(data)
                 res.end(spider(data))
             })
             break;
@@ -60,5 +61,6 @@ function spider(data) {
     })
     console.log(movies)
     return JSON.stringify(movies)
+    // return data
 
 }

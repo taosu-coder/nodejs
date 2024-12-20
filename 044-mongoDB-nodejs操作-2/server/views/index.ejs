@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>
+    <%= title %>
+  </title>
+  <link rel='stylesheet' href='/stylesheets/style.css' />
+</head>
+
+<body>
+  <h1>mongoDB增删改查的演示</h1>
+  <div>
+    <div>用户名：<input type="text" id="username"></div>
+    <div>密码：<input type="password" id="password"></div>
+    <div>年龄：<input type="number" id="age"></div>
+    <div><button onclick="registerFunc()">注册</button></div>
+  </div>
+  <hr>
+
+  <div>
+    <div>新用户名：<input type="text" id="newUsername" placeholder="新用户名">
+    </div>
+    <div>新密码：<input type="password" id="newPassword" placeholder="新密码">
+    </div>
+    <div>新年龄：<input type="number" id="newAge" placeholder="新年龄">
+    </div>
+  </div>
+  <hr>
+
+  <div>
+    <label for=""> 页码: <input id="pageIndex" type="text"></label>
+    <label for=""> 页码大小: <input id="pageSize" type="text"></label>
+    <button onclick="renderByOption({page:pageIndex.value, limit: pageSize.value})">跳转</button>
+  </div>
+  <table border="1" onclick="onTableClick(event)">
+    <thead>
+      <tr>
+        <td>id</td>
+        <td>用户名</td>
+        <td>年龄</td>
+      </tr>
+    </thead>
+    <tbody>
+
+    </tbody>
+
+  </table>
+
+  <script>
+    const register = document.querySelector("#register")
+    const username = document.querySelector("#username")
+    const password = document.querySelector("#password")
+    const age = document.querySelector("#age")
+    const tbody = document.querySelector("tbody")
+
+
+    // 全局函数 updateFunc
+    const updateFunc = (id) => {
+      //id值之后要改为动态获取id
+      fetch(`/api/user/update/${id}`, {
+        method: "POST",
+        body: JSON.stringify({
+          // 带给后端的数据
+          username: newUsername.value,
+          password: newPassword.value,
+          age: newAge.value
+        }),
+        headers: {
+          "content-type": "application/json"
+        }
+      }).then(res => res.json()).then(res => {
+        console.log(res)
+        // 刷新页面
+        renderByOption()
+      })
+    }
+
+    // 全局函数 删除
+    const deleteFunc = (id) => {
+      fetch(`/api/user/delete/${id}`).then(res => res.json()).then(({ ok }) => {
+        console.log(`删除${id} ${ok}`)
+        // 拿到当前页
+        const pageOption = {
+          page: pageIndex.value,
+          limit: pageSize.value
+        }
+        // 刷新页面
+        renderByOption(pageOption)
+      })
+    }
+
+    // 全局函数 注册
+    const registerFunc = () => {
+      fetch("/api/user/add", {
+        method: "POST",
+        body: JSON.stringify({
+          // 带给后端的数据
+          username: username.value,
+          password: password.value,
+          age: age.value
+        }),
+        headers: {
+          "content-type": "application/json"
+        }
+      }).then(res => res.json()).then(res => {
+        const params = { page: 1, limit: 10 }
+        renderByOption(params)
+      })
+    }
+
+    // table 被点击的响应
+    function onTableClick({ target } /* event */) { // 解构 event 拿出 target
+      // const { target } = event
+      // const { className, dataset } = target
+      // 解构 target 拿出 className, dataset 
+      const { className, dataset } = target
+      // 解构 dataset 拿出 id
+      const { id } = dataset
+      // 判断元素 className
+      switch (className) {
+        // 如果是 删除按钮
+        case 'delete_btn':
+          // 那么删除数据
+          deleteFunc(id)
+          break;
+        // 如果是更新按钮
+        case 'update_btn':
+          // 那么更新数据
+          updateFunc(id)
+          break;
+        // 如果是其他区域
+        default:
+          // 那么什么都不做
+          break
+      }
+    }
+
+    const renderByOption = (option = { page: 1, limit: 10 }) => {
+      const { page, limit } = option
+      //获取列表
+      fetch(`/api/user/list?page=${page}&limit=${limit}`).then(res => res.json()).then(res => {
+        console.log(res)
+        tbody.innerHTML = res.map(item => `
+      <tr>
+        <td>${item._id}</td>
+        <td>${item.username}</td>
+        <td>${item.age}</td>
+        <td>
+          <!-- <button data-id=${item._id} onclick="updateFunc(event, '${item._id}')">更新</button> -->
+          <button data-id=${item._id} class="update_btn">更新</button>
+          <button data-id=${item._id} class="delete_btn">删除</button>
+        </td>
+        </tr>
+        `).join("")
+      })
+    }
+
+    renderByOption();
+
+
+
+  </script>
+</body>
+
+</html>
+
+// 冒泡排序
+// 插入排序
+// 快速排序
+// 选择排序
+// 归并排序
+// 堆排序
+
+
+// 12种设计模式
+
+// 动态规划
+// 贪心算法
+
+// 软件设计的6大原则
