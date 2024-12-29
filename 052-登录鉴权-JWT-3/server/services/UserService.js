@@ -1,4 +1,4 @@
-const { updateUser, deleteUser, getUser } = require("../controllers/Usercontroller")
+// const { updateUser, deleteUser, getUser } = require("../controllers/Usercontroller")
 const UserModel = require("../model/usermodel")
 const UserService = {
     addUser: (username, password, age) => {

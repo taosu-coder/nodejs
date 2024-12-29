@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <!-- 客户端 -->
+    <h1>chat</h1>
+
+    <!-- 脚本 -->
+    <script>
+        // WebSocket()基于浏览器内置的函数
+        var ws = new WebSocket("ws://localhost:8080")//3000端口号被http服务器占用
+        ws.onopen = () => {
+            console.log("连接成功")
+        }
+        ws.onmessage = (msgObj) => {
+            //服务端send的消息，客户端可以收到 '欢迎来到聊天室'
+            console.log(msgObj.data)
+        }
+        ws.onerror = () => {
+            console.log("error")
+        }
+        //浏览器控制台ws.send("内容"),就能send信息
+    </script>
+</body>
+
+</html>

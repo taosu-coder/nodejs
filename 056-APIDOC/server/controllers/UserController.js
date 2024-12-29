@@ -59,7 +59,7 @@ const UserController = {
             //设置token
             const token = JWT.generate({
                 _id: data[0].id,
-                password: data[0].password
+                username: data[0].username
             }, "1h")
 
             //token返回在header中给前端，前端给token传回来也放在header中传输（不成文的规范）
